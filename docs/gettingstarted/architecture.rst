@@ -87,13 +87,13 @@ Runtime
 
 The runtime module uses `Docker`_ to run containers for deployed applications.
 
-.. _proxy:
+.. _router:
 
 Router
 ------
 
 The router module uses `Nginx`_ to route traffic to application containers. There is also
-another router for handling incoming traffic to Deis' modules.
+another router for handling incoming traffic to Deis's components.
 
 .. _`Django`: https://www.djangoproject.com/
 .. _`Celery`: http://www.celeryproject.org/
