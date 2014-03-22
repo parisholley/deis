@@ -7,7 +7,7 @@
 Architecture
 ============
 
-Deis consists of 9 modules that combine to create a distributed PaaS.
+Deis consists of multiple modules that combine to create a distributed PaaS.
 Each Deis module is deployed as a :ref:`Container`.
 
 .. _arch_controller:
@@ -89,10 +89,11 @@ The runtime module uses `Docker`_ to run containers for deployed applications.
 
 .. _proxy:
 
-Proxy
------
+Router
+------
 
-The proxy module uses `Nginx`_ to route traffic to application containers.
+The router module uses `Nginx`_ to route traffic to application containers. There is also
+another router for handling incoming traffic to Deis' modules.
 
 .. _`Django`: https://www.djangoproject.com/
 .. _`Celery`: http://www.celeryproject.org/
