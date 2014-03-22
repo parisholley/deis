@@ -26,3 +26,6 @@ kill:
 
 clean:
 	docker rmi deis/router
+
+test:
+	docker build .
