@@ -41,7 +41,7 @@ to the :ref:`Registry`, you can set a new value in Redis like so:
 
 .. code-block:: console
 
-    ><> dig registry.deisapp.com
+    $ dig registry.deisapp.com
     [...]
     ;; ANSWER SECTION:
     registry.deisapp.com. 1649 IN  A   <ip-address>
