@@ -60,7 +60,8 @@ class Cluster(UuidAuditedModel):
     Cluster used to run jobs
     """
 
-    CLUSTER_TYPES = (('mock', 'Mock Cluster'),)
+    CLUSTER_TYPES = (('mock', 'Mock Cluster'),
+                     ('coreos', 'CoreOS Cluster'))
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
     id = models.CharField(max_length=128, unique=True)
