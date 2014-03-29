@@ -108,8 +108,8 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStart=/bin/bash -c 'docker start -a {name} || docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image}'  # noqa
-ExecStop=/usr/bin/docker stop {name}
+ExecStart=/bin/bash -c '/usr/bin/docker run --rm -P -e ETCD=172.17.42.1:4001 {image} {command}'  # noqa
+#ExecStop=/usr/bin/docker stop {name}
 """
 
 ROUTER_TEMPLATE = """
@@ -119,7 +119,7 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStart=/bin/bash -c 'docker start -a {name} || docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image}'  # noqa
+ExecStart=/bin/bash -c '/usr/bin/docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image} {command}'  # noqa
 ExecStop=/usr/bin/docker stop {name}
 """
 
@@ -130,6 +130,6 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-ExecStart=/bin/bash -c 'docker start -a {name} || docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image}'  # noqa
+ExecStart=/bin/bash -c '/usr/bin/docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image} {command}'  # noqa
 ExecStop=/usr/bin/docker stop {name}
 """
