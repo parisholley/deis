@@ -11,6 +11,18 @@ from celery import task
 
 
 @task
+def create_cluster(cluster):
+    cluster._scheduler.setUp()
+
+
+@task
+def destroy_cluster(cluster):
+    for app in cluster.app_set.all():
+        app.destroy()
+    cluster._scheduler.tearDown()
+
+
+@task
 def deploy_release(app, release):
     containers = app.container_set.all()
     # TODO: parallelize

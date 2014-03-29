@@ -8,7 +8,23 @@ class MockSchedulerClient(object):
         self.hosts = hosts
         self.auth = auth
 
-    def create(self, name, image, command, resources={}, constraints={}):
+    # scheduler setup / teardown
+
+    def setUp(self):
+        """
+        Setup a Cluster including router and log aggregator
+        """
+        return None
+
+    def tearDown(self):
+        """
+        Tear down a cluster including router and log aggregator
+        """
+        return None
+
+    # job api
+
+    def create(self, name, image, command):
         """
         Create a new job
         """
