@@ -92,6 +92,17 @@ class FleetClient(object):
             'fleetctl.sh destroy {name}.service'.format(**locals()),
             shell=True, env=self.env)
 
+    def run(self, name, image, command):
+        """
+        Run a one-off command
+        """
+        print 'Running {name}'.format(**locals())
+        output = subprocess.PIPE
+        p = subprocess.Popen('fleetrun.sh {command}'.format(**locals()), shell=True, env=self.env,
+                             stdout=output, stderr=subprocess.STDOUT)
+        rc = p.wait()
+        return rc, p.stdout.read()
+
     def attach(self, name):
         """
         Attach to a job's stdin, stdout and stderr
