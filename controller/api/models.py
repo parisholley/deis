@@ -86,13 +86,13 @@ class Cluster(UuidAuditedModel):
         """
         Initialize a cluster's router and log aggregator
         """
-        tasks.create_cluster.delay(self)
+        return tasks.create_cluster.delay(self).get()
 
     def destroy(self):
         """
         Destroy a cluster's router and log aggregator
         """
-        tasks.destroy_cluster.delay(self)
+        return tasks.destroy_cluster.delay(self).get()
 
 
 @python_2_unicode_compatible
@@ -122,7 +122,7 @@ class App(UuidAuditedModel):
             c.destroy()
 
     def deploy(self, release):
-        return tasks.deploy_release.delay(self, release)
+        return tasks.deploy_release.delay(self, release).get()
 
     def scale(self, **kwargs):
         """Scale containers up or down to match requested."""
