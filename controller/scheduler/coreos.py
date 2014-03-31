@@ -2,6 +2,7 @@ from cStringIO import StringIO
 import base64
 import os
 import random
+import re
 import subprocess
 
 
@@ -9,6 +10,7 @@ ROOT_DIR = os.path.join(os.getcwd(), 'coreos')
 if not os.path.exists(ROOT_DIR):
     os.mkdir(ROOT_DIR)
 
+MATCH = re.compile('(?P<app>[a-z0-9-]+)_?(?P<version>v[0-9]+)?\.?(?P<c_type>[a-z]+)?.(?P<c_num>[0-9]+)')
 
 class FleetClient(object):
 
@@ -32,10 +34,10 @@ class FleetClient(object):
         """
         Setup a CoreOS cluster including router and log aggregator
         """
-        print 'Creating deis-router'
-        self._create_router('deis-router', 'deis/router', command='', port=80)
-        print 'Creating deis-logger'
-        self._create_logger('deis-logger', 'deis/logger', command='', port=514)
+        print 'Creating deis-router.1'
+        self._create_router('deis-router.1', 'deis/router', command='', port=80)
+        print 'Creating deis-logger.1'
+        self._create_logger('deis-logger.1', 'deis/logger', command='', port=514)
 
     def _create_router(self, name, image, command, port):
         env = self.env.copy()
@@ -85,20 +87,26 @@ class FleetClient(object):
     # TODO: remove hardcoded ports
 
     def _create_container(self, name, image, command, template, env, port):
+        l = locals().copy()
+        l.update(re.match(MATCH, name).groupdict())
         env.update({'FLEETW_UNIT': name + '.service'})
-        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**locals()))})
-        return subprocess.check_call('fleetctl.sh submit {name}.service'.format(**locals()),
+        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**l))})
+        return subprocess.check_call('fleetctl.sh submit {name}.service'.format(**l),
                                      shell=True, env=env)
 
     def _create_announcer(self, name, image, command, template, env, port):
+        l = locals().copy()
+        l.update(re.match(MATCH, name).groupdict())
         env.update({'FLEETW_UNIT': name + '-announce' + '.service'})
-        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**locals()))})
-        return subprocess.check_call('fleetctl.sh submit {name}-announce.service'.format(**locals()),  # noqa
+        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**l))})
+        return subprocess.check_call('fleetctl.sh submit {name}-announce.service'.format(**l),  # noqa
                                      shell=True, env=env)
 
     def _create_log(self, name, image, command, template, env, port):
+        l = locals().copy()
+        l.update(re.match(MATCH, name).groupdict())
         env.update({'FLEETW_UNIT': name + '-log' + '.service'})
-        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**locals()))})
+        env.update({'FLEETW_UNIT_DATA': base64.b64encode(template.format(**l))})
         return subprocess.check_call('fleetctl.sh submit {name}-log.service'.format(**locals()),  # noqa
                                      shell=True, env=env)
 
@@ -216,8 +224,8 @@ BindsTo={name}.service
 
 [Service]
 ExecStartPre=/bin/sh -c "until /usr/bin/docker port {name} {port} >/dev/null 2>&1; do sleep 2; done; port=$(docker port {name} {port} | cut -d ':' -f2); echo Waiting for $port/tcp...; until cat </dev/null>/dev/tcp/%H/$port; do sleep 1; done"
-ExecStart=/bin/sh -c "port=$(docker port {name} {port} | cut -d ':' -f2); echo Connected to $port/tcp, publishing to etcd...; while netstat -lnt | grep $port >/dev/null; do etcdctl set /deis/services/{name} %H:$port --ttl 60; sleep 45; done"
-ExecStop=/usr/bin/etcdctl rm --recursive /deis/services/{name}
+ExecStart=/bin/sh -c "port=$(docker port {name} {port} | cut -d ':' -f2); echo Connected to $port/tcp, publishing to etcd...; while netstat -lnt | grep $port >/dev/null; do etcdctl set /deis/services/{app}/{name} %H:$port --ttl 60; sleep 45; done"
+ExecStop=/usr/bin/etcdctl rm --recursive /deis/services/{app}/{name}
 
 [X-Fleet]
 X-ConditionMachineOf={name}.service
@@ -230,7 +238,7 @@ BindsTo={name}.service
 
 [Service]
 ExecStartPre=/bin/sh -c "until /usr/bin/docker inspect {name} >/dev/null 2>&1; do sleep 1; done"
-ExecStart=/bin/sh -c "/usr/bin/docker logs -f {name} 2>&1 | logger -p local0.info -t {name} --tcp --server $(etcdctl get /deis/services/deis-logger | cut -d ':' -f1) --port $(etcdctl get /deis/services/deis-logger | cut -d ':' -f2)"
+ExecStart=/bin/sh -c "/usr/bin/docker logs -f {name} 2>&1 | logger -p local0.info -t {app}[{c_type}.{c_num}] --tcp --server $(etcdctl get /deis/services/deis-logger/deis-logger.1 | cut -d ':' -f1) --port $(etcdctl get /deis/services/deis-logger/deis-logger.1 | cut -d ':' -f2)"
 
 [X-Fleet]
 X-ConditionMachineOf={name}.service
@@ -247,7 +255,6 @@ ExecStartPre=/usr/bin/docker pull {image}
 ExecStart=-/usr/bin/docker run --name {name} -P -e ETCD=172.17.42.1:4001 {image} {command}
 ExecStop=-/usr/bin/docker rm -f {name}
 """
-
 
 LOGGER_TEMPLATE = """
 [Unit]

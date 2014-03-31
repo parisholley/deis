@@ -222,9 +222,9 @@ class Container(UuidAuditedModel):
         num = self.num
         c_type = self.type
         if not c_type:
-            job_id = "{app}.{version}.{num}".format(**locals())
+            job_id = "{app}_{version}.{num}".format(**locals())
         else:
-            job_id = "{app}_{c_type}.{version}.{num}".format(**locals())
+            job_id = "{app}_{version}.{c_type}.{num}".format(**locals())
         return job_id
 
     _job_id = property(_get_job_id)
