@@ -14,14 +14,17 @@ MATCH = re.compile('(?P<app>[a-z0-9-]+)_?(?P<version>v[0-9]+)?\.?(?P<c_type>[a-z
 
 class FleetClient(object):
 
-    def __init__(self, cluster_name, hosts, auth):
+    def __init__(self, cluster_name, hosts, auth, domain, options):
         self.name = cluster_name
         self.hosts = hosts
+        self.domain = domain
+        self.options = options
         self.auth = auth
         self.auth_path = os.path.join(ROOT_DIR, 'ssh-{cluster_name}'.format(**locals()))
         with open(self.auth_path, 'w') as f:
             f.write(base64.b64decode(auth))
             os.chmod(self.auth_path, 0600)
+
         self.env = {
             'PATH': '/usr/local/bin:/usr/bin:/bin:{}'.format(
                 os.path.abspath(os.path.join(__file__, '..'))),
@@ -67,10 +70,10 @@ class FleetClient(object):
         Tear down a CoreOS cluster including router and log aggregator
         """
         env = self.env.copy()
-        print 'Destroying deis-router'
-        self._destroy_router('deis-router', env)
-        print 'Destroying deis-logger'
-        self._destroy_logger('deis-logger', env)
+        print 'Destroying deis-router.1'
+        self._destroy_router('deis-router.1', env)
+        print 'Destroying deis-logger.1'
+        self._destroy_logger('deis-logger.1', env)
 
     # job api
 

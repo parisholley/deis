@@ -78,7 +78,8 @@ class Cluster(UuidAuditedModel):
     def _get_scheduler(self, *args, **kwargs):
         module_name = 'scheduler.' + self.type
         mod = importlib.import_module(module_name)
-        return mod.SchedulerClient(self.id, self.hosts, self.auth)
+        return mod.SchedulerClient(self.id, self.hosts, self.auth,
+                                   self.domain, self.options)
 
     _scheduler = property(_get_scheduler)
 
