@@ -1,12 +1,26 @@
 build:
 	docker build -t deis/logger .
 
-run:
-	docker run -rm -p :514 -e ETCD=$${ETCD:-127.0.0.1:4001} deis/logger
-	exit 0
+install:
+	vagrant ssh -c 'sudo systemctl enable /home/core/share/logger/systemd/*'
 
-shell:
-	docker run -t -i -rm deis/logger /bin/bash
+uninstall:
+	vagrant ssh -c 'sudo systemctl disable /home/core/share/logger/systemd/*'
 
-clean:
+start:
+	vagrant ssh -c 'sudo systemctl start deis-logger.service'
+
+stop:
+	vagrant ssh -c 'sudo systemctl stop deis-logger.service'
+
+restart:
+	vagrant ssh -c 'sudo systemctl restart deis-logger.service'
+
+logs:
+	vagrant ssh -c 'sudo journalctl -f -u deis-logger.service'
+
+run: install restart logs
+
+clean: stop uninstall
+	-docker rm -f deis-logger
 	-docker rmi deis/logger

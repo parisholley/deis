@@ -1,9 +1,37 @@
+#
+# Deis Makefile
+#
+
+# ordered list of deis components
+COMPONENTS=registry logger database cache controller builder router
+
+all: build run
+
 test_client:
 	python -m unittest discover client.tests
 
 build:
-	for image in builder cache controller database discovery logger registry deis; do \
-		pushd $$image; \
-		docker build -t deis/$$image .; \
-		popd; \
-	done
+	for c in $(COMPONENTS); do cd $$c && make build && cd ..; done
+
+install:
+	for c in $(COMPONENTS); do cd $$c && make install && cd ..; done
+
+uninstall: stop
+	-for c in $(COMPONENTS); do cd $$c ; make uninstall ; cd ..; done
+
+start:
+	for c in $(COMPONENTS); do cd $$c && make start && cd ..; done
+
+stop:
+	-for c in $(COMPONENTS); do cd $$c ; make stop ; cd ..; done
+
+restart:
+	for c in $(COMPONENTS); do cd $$c && make restart && cd ..; done
+
+logs:
+	vagrant ssh -c 'journalctl -f -u deis-* -u docker.service'
+
+run: install restart logs
+
+clean:
+	-for c in $(COMPONENTS); do cd $$c && make clean ; cd ..; done

@@ -1,12 +1,26 @@
 build:
 	docker build -t deis/cache .
 
-run:
-	docker run -rm -p :6379 -e ETCD=$${ETCD:-127.0.0.1:4001} deis/cache
-	exit 0
+install:
+	vagrant ssh -c 'sudo systemctl enable /home/core/share/cache/systemd/*'
 
-shell:
-	docker run -t -i -rm deis/cache /bin/bash
+uninstall:
+	vagrant ssh -c 'sudo systemctl disable /home/core/share/cache/systemd/*'
 
-clean:
+start:
+	vagrant ssh -c 'sudo systemctl start deis-cache.service'
+
+stop:
+	vagrant ssh -c 'sudo systemctl stop deis-cache.service'
+
+restart:
+	vagrant ssh -c 'sudo systemctl restart deis-cache.service'
+
+logs:
+	vagrant ssh -c 'sudo journalctl -f -u deis-cache.service'
+
+run: install restart logs
+
+clean: stop uninstall
+	-docker rm -f deis-cache
 	-docker rmi deis/cache

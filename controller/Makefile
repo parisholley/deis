@@ -1,14 +1,28 @@
 build:
 	docker build -t deis/controller .
 
-run:
-	docker run -p $${PORT:-8000}:$${PORT:-8000} -e ETCD=$${ETCD:-127.0.0.1:4001} -name deis-controller deis/controller
-	exit 0
+install:
+	vagrant ssh -c 'sudo systemctl enable /home/core/share/controller/systemd/*'
 
-shell:
-	docker run -t -i -e ETCD=$${ETCD:-127.0.0.1:4001} deis/controller /bin/bash
+uninstall:
+	vagrant ssh -c 'sudo systemctl disable /home/core/share/controller/systemd/*'
 
-clean:
+start:
+	vagrant ssh -c 'sudo systemctl start deis-controller.service'
+
+stop:
+	vagrant ssh -c 'sudo systemctl stop deis-controller.service'
+
+restart:
+	vagrant ssh -c 'sudo systemctl restart deis-controller.service'
+
+logs:
+	vagrant ssh -c 'sudo journalctl -f -u deis-controller.service'
+
+run: install restart logs
+
+clean: stop uninstall
+	-docker rm -f deis-controller
 	-docker rmi deis/controller
 
 test:

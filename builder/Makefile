@@ -1,16 +1,26 @@
 build:
 	docker build -t deis/builder .
 
-config:
-	-etcdctl -C $${ETCD:-127.0.0.1:4001} setdir /deis
-	-etcdctl -C $${ETCD:-127.0.0.1:4001} setdir /deis/builder
-	etcdctl -C $${ETCD:-127.0.0.1:4001} set /deis/builder/port $${PORT:-22}
+install:
+	vagrant ssh -c 'sudo systemctl enable /home/core/share/builder/systemd/*'
 
-run:
-	docker run -privileged -e ETCD=$${ETCD:-127.0.0.1:4001} -p $${PORT:-2222}:$${PORT:-22} -rm deis/builder ; exit 0
+uninstall:
+	vagrant ssh -c 'sudo systemctl disable /home/core/share/builder/systemd/*'
 
-shell:
-	docker run -privileged -e $${ETCD:-127.0.0.1:4001} -t -i -rm deis/builder /bin/bash
+start:
+	vagrant ssh -c 'sudo systemctl start deis-builder.service'
 
-clean:
+stop:
+	vagrant ssh -c 'sudo systemctl stop deis-builder.service'
+
+restart:
+	vagrant ssh -c 'sudo systemctl restart deis-builder.service'
+
+logs:
+	vagrant ssh -c 'sudo journalctl -f -u deis-builder.service'
+
+run: install restart logs
+
+clean: stop uninstall
+	-docker rm -f deis-builder
 	-docker rmi deis/builder
