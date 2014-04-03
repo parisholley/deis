@@ -4,7 +4,7 @@ build:
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/database/systemd/*'
 
-uninstall:
+uninstall: stop
 	vagrant ssh -c 'sudo systemctl disable /home/core/share/database/systemd/*'
 
 start:
@@ -21,6 +21,6 @@ logs:
 
 run: install restart logs
 
-clean: stop uninstall
+clean: uninstall
 	-docker rm -f deis-database
 	-docker rmi deis/database

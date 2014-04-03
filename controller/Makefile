@@ -4,7 +4,7 @@ build:
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/controller/systemd/*'
 
-uninstall:
+uninstall: stop
 	vagrant ssh -c 'sudo systemctl disable /home/core/share/controller/systemd/*'
 
 start:
@@ -21,7 +21,7 @@ logs:
 
 run: install restart logs
 
-clean: stop uninstall
+clean: uninstall
 	-docker rm -f deis-controller
 	-docker rmi deis/controller
 

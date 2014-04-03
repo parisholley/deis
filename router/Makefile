@@ -4,7 +4,7 @@ build:
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/router/systemd/*'
 
-uninstall:
+uninstall: stop
 	vagrant ssh -c 'sudo systemctl disable /home/core/share/router/systemd/*'
 
 start:
@@ -21,6 +21,6 @@ logs:
 
 run: install restart logs
 
-clean: stop uninstall
+clean: uninstall
 	-docker rm -f deis-router
 	-docker rmi deis/router
