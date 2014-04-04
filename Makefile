@@ -35,3 +35,6 @@ run: install restart logs
 
 clean:
 	-for c in $(COMPONENTS); do cd $$c && make clean ; cd ..; done
+
+full-clean:
+	-for c in $(COMPONENTS); do cd $$c && make full-clean ; cd ..; done

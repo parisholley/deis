@@ -23,4 +23,6 @@ run: install restart logs
 
 clean: uninstall
 	-docker rm -f deis-database
+
+full-clean: clean
 	-docker rmi deis/database
