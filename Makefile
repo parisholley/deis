@@ -29,7 +29,7 @@ restart:
 	for c in $(COMPONENTS); do cd $$c && make restart && cd ..; done
 
 logs:
-	vagrant ssh -c 'journalctl -f -u deis-* -u docker.service'
+	vagrant ssh -c 'journalctl -f -u deis-*'
 
 run: install restart logs
 
