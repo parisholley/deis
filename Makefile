@@ -11,30 +11,30 @@ test_client:
 	python -m unittest discover client.tests
 
 build:
-	for c in $(COMPONENTS); do cd $$c && make build && cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c && docker build -t deis/$$c . && cd ..; done' 
 
 install:
-	for c in $(COMPONENTS); do cd $$c && make install && cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c && sudo systemctl enable $$(pwd)/systemd/* && cd ..; done'
 
 uninstall: stop
-	-for c in $(COMPONENTS); do cd $$c ; make uninstall ; cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c && sudo systemctl disable $$(pwd)/systemd/* && cd ..; done'
 
 start:
-	for c in $(COMPONENTS); do cd $$c && make start && cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c/systemd && sudo systemctl start * && cd ../..; done'
 
 stop:
-	-for c in $(COMPONENTS); do cd $$c ; make stop ; cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c/systemd && sudo systemctl stop * && cd ../..; done'
 
 restart:
-	for c in $(COMPONENTS); do cd $$c && make restart && cd ..; done
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do cd $$c/systemd && sudo systemctl restart * && cd ../..; done'
 
 logs:
 	vagrant ssh -c 'journalctl -f -u deis-*'
 
 run: install restart logs
 
-clean:
-	-for c in $(COMPONENTS); do cd $$c && make clean ; cd ..; done
+clean: uninstall
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do docker rm -f deis-$$c; done'
 
-full-clean:
-	-for c in $(COMPONENTS); do cd $$c && make full-clean ; cd ..; done
+full-clean: clean
+	vagrant ssh -c 'cd share && for c in $(COMPONENTS); do docker rmi deis-$$c; done'
