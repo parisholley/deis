@@ -23,4 +23,6 @@ run: install restart logs
 
 clean: uninstall
 	-docker rm -f deis-router
+
+full-clean: clean
 	-docker rmi deis/router

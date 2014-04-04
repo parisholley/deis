@@ -1,3 +1,7 @@
+.PHONY: all test logs
+
+all: build run
+
 build:
 	docker build -t deis/controller .
 
@@ -23,6 +27,8 @@ run: install restart logs
 
 clean: uninstall
 	-docker rm -f deis-controller
+
+full-clean: clean
 	-docker rmi deis/controller
 
 test:

@@ -11,7 +11,7 @@ start:
 	vagrant ssh -c 'sudo systemctl start deis-registry.service'
 
 stop:
-	vagrant ssh -c 'sudo systemctl stop deis-registry.service'
+	-vagrant ssh -c 'sudo systemctl stop deis-registry.service'
 
 restart:
 	vagrant ssh -c 'sudo systemctl restart deis-registry.service'
@@ -23,4 +23,6 @@ run: install restart logs
 
 clean: uninstall
 	-docker rm -f deis-registry
+
+full-clean: clean
 	-docker rmi deis/registry
