@@ -1,5 +1,5 @@
 build:
-	docker build -t deis/discovery .
+	vagrant ssh -c 'cd share/discovery && sudo docker build -t deis/discovery .'
 
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/discovery/systemd/*'
@@ -22,5 +22,7 @@ logs:
 run: install restart logs
 
 clean: stop uninstall
-	-docker rm -f deis-discovery
-	-docker rmi deis/discovery
+	vagrant ssh -c 'sudo docker rm -f deis-discovery'
+
+full-clean: clean
+	vagrant ssh -c 'sudo docker rmi deis/discovery'

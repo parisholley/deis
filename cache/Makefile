@@ -1,5 +1,5 @@
 build:
-	docker build -t deis/cache .
+	vagrant ssh -c 'cd share/cache && sudo docker build -t deis/cache .'
 
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/cache/systemd/*'
@@ -22,7 +22,7 @@ logs:
 run: install restart logs
 
 clean: uninstall
-	-docker rm -f deis-cache
+	vagrant ssh -c 'sudo docker rm -f deis-cache'
 
 full-clean: clean
-	-docker rmi deis/cache
+	vagrant ssh -c 'sudo docker rmi deis/cache'

@@ -1,5 +1,5 @@
 build:
-	docker build -t deis/logger .
+	vagrant ssh -c 'cd share/logger && sudo docker build -t deis/logger .'
 
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/logger/systemd/*'
@@ -22,7 +22,7 @@ logs:
 run: install restart logs
 
 clean: uninstall
-	-docker rm -f deis-logger
+	vagrant ssh -c 'sudo docker rm -f deis-logger'
 
 full-clean: clean
-	-docker rmi deis/logger
+	vagrant ssh -c 'sudo docker rmi deis/logger'

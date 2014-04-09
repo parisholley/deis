@@ -1,5 +1,5 @@
 build:
-	docker build -t deis/registry .
+	vagrant ssh -c 'cd share/registry && sudo docker build -t deis/registry .'
 
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/registry/systemd/*'
@@ -22,7 +22,7 @@ logs:
 run: install restart logs
 
 clean: uninstall
-	-docker rm -f deis-registry
+	vagrant ssh -c 'sudo docker rm -f deis-registry'
 
 full-clean: clean
-	-docker rmi deis/registry
+	vagrant ssh -c 'sudo docker rmi deis/registry'

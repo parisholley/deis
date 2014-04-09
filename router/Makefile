@@ -1,5 +1,5 @@
 build:
-	docker build -t deis/router .
+	vagrant ssh -c 'cd share/router && sudo docker build -t deis/router .'
 
 install:
 	vagrant ssh -c 'sudo systemctl enable /home/core/share/router/systemd/*'
@@ -22,7 +22,7 @@ logs:
 run: install restart logs
 
 clean: uninstall
-	-docker rm -f deis-router
+	vagrant ssh -c 'sudo docker rm -f deis-router'
 
 full-clean: clean
-	-docker rmi deis/router
+	vagrant ssh -c 'sudo docker rmi deis/router'
